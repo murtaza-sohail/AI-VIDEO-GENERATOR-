@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Video Generator Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 90%;
+      padding: 3rem;
+      background: var(--card-bg);
+      border-radius: 24px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, #60a5fa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.05em;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 1.125rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .generate-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .generate-btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.6);
+    }
+
+    .generate-btn:active {
+      transform: translateY(1px);
+    }
+
+    .generate-btn:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .status-container {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    .status-container.visible {
+      display: block;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .loader {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-text {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .status-text.success { color: var(--success); }
+    .status-text.error { color: var(--error); }
+
+    /* Particles */
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>AI Video Generator Pro</h1>
+    <p>Automatically generate full-length, high-quality motivational YouTube videos from plain English scripts using AI text-to-speech, background music, and dynamic visual assembly.</p>
+    
+    <button id="generateBtn" class="generate-btn">
+      Initialize Generation
+    </button>
+
+    <div id="statusContainer" class="status-container">
+      <div id="loader" class="loader"></div>
+      <div id="statusText" class="status-text">Connecting to Vercel Serverless...</div>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('generateBtn');
+    const statusContainer = document.getElementById('statusContainer');
+    const loader = document.getElementById('loader');
+    const statusText = document.getElementById('statusText');
+
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      btn.innerText = "Generating...";
+      statusContainer.classList.add('visible');
+      loader.style.display = 'inline-block';
+      statusText.innerText = "Building video... (This process takes a few minutes)";
+      statusText.className = 'status-text';
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+
+        loader.style.display = 'none';
+        
+        if (response.ok && data.success) {
+          statusText.innerText = "✨ " + data.message;
+          statusText.className = 'status-text success';
+          btn.innerText = "Generation Complete";
+        } else {
+          statusText.innerText = "❌ Error: " + (data.error || "Generation timed out or failed.");
+          statusText.className = 'status-text error';
+          btn.disabled = false;
+          btn.innerText = "Retry Generation";
+        }
+      } catch (error) {
+        loader.style.display = 'none';
+        statusText.innerText = "❌ Network Error: Could not connect to API.";
+        statusText.className = 'status-text error';
+        btn.disabled = false;
+        btn.innerText = "Retry Generation";
+      }
+    });
+  </script>
+</body>
+</html>
