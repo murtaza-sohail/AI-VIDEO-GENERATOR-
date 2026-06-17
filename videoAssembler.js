@@ -109,6 +109,7 @@ async function assembleVideo(segments, bgMusicPath, outputFilename = 'motivation
       '-map [outa]',
       '-c:v libx264',
       '-preset ultrafast',
+      '-threads 4',
       '-crf 28',
       '-c:a aac',
       '-b:a 192k',

@@ -13,13 +13,15 @@ const BG_MUSIC_DIR = isVercel ? path.join('/tmp', 'music') : path.join(BASE_DIR,
 
 module.exports = {
   // --- TARGET DURATION ---
-  TARGET_DURATION_SECONDS: 13 * 60, // 13 minutes exact
+  // On Vercel, we must reduce the duration to 60 seconds maximum to fit in the serverless timeout limit.
+  // Otherwise, it will never finish.
+  TARGET_DURATION_SECONDS: isVercel ? 60 : 13 * 60, 
 
   // --- VIDEO SETTINGS ---
-  VIDEO_WIDTH: 1920,
-  VIDEO_HEIGHT: 1080,
-  VIDEO_FPS: 24,
-  BITRATE: '8000k',
+  VIDEO_WIDTH: isVercel ? 854 : 1920,
+  VIDEO_HEIGHT: isVercel ? 480 : 1080,
+  VIDEO_FPS: isVercel ? 15 : 24,
+  BITRATE: isVercel ? '1000k' : '8000k',
 
   // --- AUDIO SETTINGS ---
   AUDIO_SAMPLE_RATE: 44100,
