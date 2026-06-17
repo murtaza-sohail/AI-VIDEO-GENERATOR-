@@ -395,7 +395,11 @@ async function main() {
   console.log(`   Output: ${outputPath}`);
 }
 
-main().catch(err => {
-  console.error("❌ Fatal Error:", err);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    console.error("❌ Fatal Error:", err);
+    process.exit(1);
+  });
+}
+
+module.exports = { main };

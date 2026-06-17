@@ -5,7 +5,11 @@ const path = require('path');
 require('dotenv').config();
 
 const BASE_DIR = __dirname;
-const TEMP_DIR = path.join(BASE_DIR, 'temp');
+const isVercel = process.env.VERCEL === '1';
+
+const TEMP_DIR = isVercel ? path.join('/tmp', 'temp') : path.join(BASE_DIR, 'temp');
+const OUTPUT_DIR = isVercel ? path.join('/tmp', 'output') : path.join(BASE_DIR, 'output');
+const BG_MUSIC_DIR = isVercel ? path.join('/tmp', 'music') : path.join(BASE_DIR, 'assets', 'music');
 
 module.exports = {
   // --- TARGET DURATION ---
@@ -39,10 +43,10 @@ module.exports = {
   // --- PATHS ---
   BASE_DIR,
   TEMP_DIR,
-  OUTPUT_DIR: path.join(BASE_DIR, 'output'),
+  OUTPUT_DIR,
   MEDIA_CACHE_DIR: path.join(TEMP_DIR, 'media_cache'),
   AUDIO_DIR: path.join(TEMP_DIR, 'audio'),
-  BG_MUSIC_DIR: path.join(BASE_DIR, 'assets', 'music'),
+  BG_MUSIC_DIR,
   FALLBACK_IMAGE: path.join(BASE_DIR, 'assets', 'fallback.jpg'),
 };
 
@@ -50,10 +54,10 @@ module.exports = {
 const fs = require('fs');
 [
   TEMP_DIR,
-  path.join(BASE_DIR, 'output'),
+  OUTPUT_DIR,
   path.join(TEMP_DIR, 'media_cache'),
   path.join(TEMP_DIR, 'audio'),
-  path.join(BASE_DIR, 'assets', 'music')
+  BG_MUSIC_DIR
 ].forEach(dir => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
